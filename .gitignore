@@ -36,3 +36,6 @@ yarn-error.log*
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Machine-local agent permissions; launch.json is shared, this is not.
+.claude/settings.local.json
