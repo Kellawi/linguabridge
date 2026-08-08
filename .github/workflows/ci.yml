@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          # Build-time placeholders only. Real values live in the Vercel
+          # dashboard. No secret is needed to compile: every secret is read
+          # lazily at request time, never at module load.
+          SESSION_SECRET: ci-placeholder-value-not-a-real-secret
+
+      # The guard on this project's central requirement: no API key may reach
+      # the browser. Fails the build if a key-shaped string appears anywhere in
+      # the compiled client bundle.
+      - name: Verify no secrets in client bundle
+        run: npm run verify:secrets
